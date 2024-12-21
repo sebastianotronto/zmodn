@@ -5,27 +5,35 @@
 #include <iostream>
 #include <optional>
 #include <tuple>
+#include <type_traits>
 
-std::tuple<int64_t, int64_t, int64_t> extended_gcd(int64_t, int64_t);
+template<typename INT>
+requires std::is_integral_v<INT>
+std::tuple<INT, INT, INT> extended_gcd(INT a, INT b) {
+	if (b == 0) return {a, 1, 0};
+	auto [g, x, y] = extended_gcd(b, a%b);
+	return {g, y, x - y*(a/b)};
+}
 
-template<int64_t N> requires(N > 1)
+template<auto N>
+requires(N > 1) && std::is_integral_v<decltype(N)>
 class Zmod {
 public:
-	Zmod(int64_t z) : int64{(z%N + N) % N} {}
-	int64_t toint64() const { return int64; }
+	Zmod(decltype(N) z) : value{(z%N + N) % N} {}
+	decltype(N) toint() const { return value; }
 
-	Zmod operator+(const Zmod& z) const { return int64 + z.int64; }
-	Zmod operator-(const Zmod& z) const { return int64 - z.int64; }
-	Zmod operator*(const Zmod& z) const { return int64 * z.int64; }
-	Zmod operator+=(const Zmod& z) { return (*this) = int64 + z.int64; }
-	Zmod operator-=(const Zmod& z) { return (*this) = int64 - z.int64; }
-	Zmod operator*=(const Zmod& z) { return (*this) = int64 * z.int64; }
+	Zmod operator+(const Zmod& z) const { return value + z.value; }
+	Zmod operator-(const Zmod& z) const { return value - z.value; }
+	Zmod operator*(const Zmod& z) const { return value * z.value; }
+	Zmod operator+=(const Zmod& z) { return (*this) = value + z.value; }
+	Zmod operator-=(const Zmod& z) { return (*this) = value - z.value; }
+	Zmod operator*=(const Zmod& z) { return (*this) = value * z.value; }
 
-	bool operator==(const Zmod& z) const { return int64 == z.int64; }
-	bool operator!=(const Zmod& z) const { return int64 != z.int64; }
+	bool operator==(const Zmod& z) const { return value == z.value; }
+	bool operator!=(const Zmod& z) const { return value != z.value; }
 
 	std::optional<Zmod> inverse() const {
-		auto [g, a, _] = extended_gcd(int64, N);
+		auto [g, a, _] = extended_gcd(value, N);
 		return g == 1 ? Zmod(a) : std::optional<Zmod>{};
 	}
 
@@ -40,16 +48,10 @@ public:
 	}
 
 	friend std::ostream& operator<<(std::ostream& os, const Zmod<N>& z) {
-		return os << "(" << z.int64 << " mod " << N << ")";
+		return os << "(" << z.value << " mod " << N << ")";
 	}
 private:
-	int64_t int64;
+	decltype(N) value;
 };
-
-std::tuple<int64_t, int64_t, int64_t> extended_gcd(int64_t a, int64_t b) {
-	if (b == 0) return {a, 1, 0};
-	auto [g, x, y] = extended_gcd(b, a%b);
-	return {g, y, x - y*(a/b)};
-}
 
 #endif

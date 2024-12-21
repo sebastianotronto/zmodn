@@ -34,7 +34,7 @@ public:
 	.name = "Constructor 2 mod 3",
 	.f = []() {
 		Zmod<3> two = Zmod<3>(2);
-		assert_equal(two.toint64(), INT64_C(2));
+		assert_equal(two.toint(), INT64_C(2));
 	}
 },
 {
@@ -121,7 +121,7 @@ public:
 		Zmod<10> n = 8;
 		Zmod<10> m = 9;
 		auto prod = m * n;
-		assert_equal(prod.toint64(), 2);
+		assert_equal(prod.toint(), 2);
 	}
 },
 {
@@ -130,7 +130,7 @@ public:
 		Zmod<10> n = 8;
 		Zmod<10> m = 9;
 		n *= m;
-		assert_equal(n.toint64(), 2);
+		assert_equal(n.toint(), 2);
 	}
 },
 };
