@@ -141,16 +141,6 @@ public:
 		assert_equal(p, 92);
 	}
 },
-{
-	.name = "4 / 2 mod 6",
-	.f = []() {
-		Zmod<6> four = 4;
-		Zmod<6> two = 2;
-		auto d = four / two;
-		assert_equal(d.has_value(), true);
-		assert_equal(d.value(), 2);
-	}
-},
 };
 
 int main() {

@@ -40,15 +40,13 @@ public:
 	bool operator!=(const Zmod& z) const { return value != z.value; }
 
 	std::optional<Zmod> inverse() const {
-		auto [g, a, b] = extended_gcd(value, N);
+		auto [g, a, _] = extended_gcd(value, N);
 		return g == 1 ? Zmod(a) : std::optional<Zmod>{};
 	}
 
 	std::optional<Zmod> operator/(const Zmod& d) const {
-		auto [g, x, y] = extended_gcd(value, d.toint());
-		auto [a, b] = std::pair<Zmod, Zmod>{value / g, d.toint() / g};
-		auto i = b.inverse();
-		return i ? a * i.value() : i;
+		auto i = d.inverse();
+		return i ? (*this) * i.value() : i;
 	}
 
 	std::optional<Zmod> operator/=(const Zmod& d) {
