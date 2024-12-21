@@ -25,9 +25,16 @@ public:
 	Zmod operator+(const Zmod& z) const { return value + z.value; }
 	Zmod operator-(const Zmod& z) const { return value - z.value; }
 	Zmod operator*(const Zmod& z) const { return value * z.value; }
+
 	Zmod operator+=(const Zmod& z) { return (*this) = value + z.value; }
 	Zmod operator-=(const Zmod& z) { return (*this) = value - z.value; }
 	Zmod operator*=(const Zmod& z) { return (*this) = value * z.value; }
+
+	Zmod operator^(decltype(N) z) const {
+		if (z == 0) return 1;
+		if (z % 2 == 0) return (((*this) * (*this)) ^ (z/2));
+		return (*this) * ((*this) ^ (z-1));
+	}
 
 	bool operator==(const Zmod& z) const { return value == z.value; }
 	bool operator!=(const Zmod& z) const { return value != z.value; }

@@ -133,6 +133,14 @@ public:
 		assert_equal(n.toint(), 2);
 	}
 },
+{
+	.name = "2^12 mod 154",
+	.f = []() {
+		Zmod<154> b = 2;
+		auto p = b ^ 12;
+		assert_equal(p, 92);
+	}
+},
 };
 
 int main() {
