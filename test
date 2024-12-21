@@ -115,6 +115,24 @@ public:
 		assert_equal(n, Zmod<12>(4));
 	}
 },
+{
+	.name = "Multiplication overflow",
+	.f = []() {
+		Zmod<10> n = 8;
+		Zmod<10> m = 9;
+		auto prod = m * n;
+		assert_equal(prod.toint64(), 2);
+	}
+},
+{
+	.name = "Multiplication and assignment overflow",
+	.f = []() {
+		Zmod<10> n = 8;
+		Zmod<10> m = 9;
+		n *= m;
+		assert_equal(n.toint64(), 2);
+	}
+},
 };
 
 int main() {

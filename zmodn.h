@@ -17,9 +17,9 @@ public:
 	Zmod operator+(const Zmod& z) const { return int64 + z.int64; }
 	Zmod operator-(const Zmod& z) const { return int64 - z.int64; }
 	Zmod operator*(const Zmod& z) const { return int64 * z.int64; }
-	Zmod operator+=(const Zmod& z) { return int64 += z.int64; }
-	Zmod operator-=(const Zmod& z) { return int64 -= z.int64; }
-	Zmod operator*=(const Zmod& z) { return int64 *= z.int64; }
+	Zmod operator+=(const Zmod& z) { return (*this) = int64 + z.int64; }
+	Zmod operator-=(const Zmod& z) { return (*this) = int64 - z.int64; }
+	Zmod operator*=(const Zmod& z) { return (*this) = int64 * z.int64; }
 
 	bool operator==(const Zmod& z) const { return int64 == z.int64; }
 	bool operator!=(const Zmod& z) const { return int64 != z.int64; }
