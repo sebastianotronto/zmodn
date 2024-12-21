@@ -46,26 +46,10 @@ private:
 	int64_t int64;
 };
 
-void swapdiv(int64_t& oldx, int64_t& x, int64_t q) {
-	int64_t tmp = x;
-	x = oldx - q*tmp;
-	oldx = tmp;
-}
-
 std::tuple<int64_t, int64_t, int64_t> extended_gcd(int64_t a, int64_t b) {
-	int64_t oldr = a;
-	int64_t r = b;
-	int64_t olds = 1;
-	int64_t s = 0;
-	int64_t oldt = 0;
-	int64_t t = 1;
-	while (r != 0) {
-		auto q = oldr / r;
-		swapdiv(oldr, r, q);
-		swapdiv(olds, s, q);
-		swapdiv(oldt, t, q);
-	}
-	return {oldr, olds, oldt};
+	if (b == 0) return {a, 1, 0};
+	auto [g, x, y] = extended_gcd(b, a%b);
+	return {g, y, x - y*(a/b)};
 }
 
 #endif
