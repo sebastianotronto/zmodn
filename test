@@ -2,13 +2,16 @@
 
 cc=${CC:-g++}
 bin="$(mktemp)"
-${cc} -x c++ -std=c++20 -o "$bin" "$(realpath $0)"
+${cc} -x c++ -std=c++20 -o "$bin" -g -O0 "$(realpath $0)"
+echo "Running $bin"
 "$bin"
 
 exit 0
 #endif
 
 #include "zmodn.h"
+#include "bigint.h"
+
 #include <concepts>
 #include <functional>
 #include <iostream>
@@ -141,6 +144,350 @@ public:
 		assert_equal(p, 92);
 	}
 },
+{
+	.name = "BigInt constructor zero",
+	.f = []() {
+		BigInt x;
+		BigInt y(0);
+
+		assert_equal(x, y);
+	}
+},
+{
+	.name = "BigInt constructor one digit",
+	.f = []() {
+		BigInt x(12345);
+		BigInt y("12345");
+
+		assert_equal(x, y);
+	}
+},
+{
+	.name = "BigInt constructor many small digits",
+	.f = []() {
+		BigInt<20, 2> x(123456789);
+		BigInt<20, 2> y("123456789");
+
+		assert_equal(x, y);
+	}
+},
+{
+	.name = "BigInt constructor negative many small digits",
+	.f = []() {
+		BigInt<20, 2> x(-123456789);
+		BigInt<20, 2> y("-123456789");
+
+		assert_equal(x, y);
+	}
+},
+{
+	.name = "BigInt operator==",
+	.f = []() {
+		BigInt<20, 2> x(123456789);
+		BigInt<20, 2> y("123456789");
+		BigInt<20, 2> z("12456789");
+
+		bool eq = (x == y);
+		bool diff = (x == z);
+
+		assert_equal(eq, true);
+		assert_equal(diff, false);
+	},
+},
+{
+	.name = "BigInt operator== negative",
+	.f = []() {
+		BigInt<20, 2> x("-123456789");
+		BigInt<20, 2> z("123456789");
+
+		bool diff = (x == z);
+
+		assert_equal(diff, false);
+	},
+},
+{
+	.name = "BigInt operator!= true",
+	.f = []() {
+		BigInt<20, 2> x(12345678);
+		BigInt<20, 2> y("123456789");
+		BigInt<20, 2> z("123456789");
+
+		bool diff = (x != y);
+		bool eq = (y != z);
+
+		assert_equal(diff, true);
+		assert_equal(eq, false);
+	},
+},
+{
+	.name = "BigInt operator< and operator>",
+	.f = []() {
+		BigInt<20, 2> x(7891);
+		BigInt<20, 2> y(7881);
+	
+		bool t = (y < x);
+		bool f = (x < y);
+
+		assert_equal(t, true);
+		assert_equal(f, false);
+	}
+},
+{
+	.name = "BigInt operator< both negative",
+	.f = []() {
+		BigInt<20, 2> x(-7891);
+		BigInt<20, 2> y(-7881);
+	
+		bool cmp = (x < y);
+
+		assert_equal(cmp, true);
+	}
+},
+{
+	.name = "BigInt operator< different sign",
+	.f = []() {
+		BigInt<20, 2> x(-7);
+		BigInt<20, 2> y(7);
+	
+		bool cmp = (x < y);
+
+		assert_equal(cmp, true);
+	}
+},
+{
+	.name = "BigInt abs",
+	.f = []() {
+		BigInt<20, 2> x(-1234567);
+		BigInt<20, 2> y(7654321);
+
+		assert_equal(x.abs(), BigInt<20, 2>(1234567));
+		assert_equal(y.abs(), y);
+	}
+},
+{
+	.name = "BigInt opposite",
+	.f = []() {
+		BigInt<20, 2> x(-1234567);
+		BigInt<20, 2> y(7654321);
+
+		assert_equal(-x, BigInt<20, 2>(1234567));
+		assert_equal(-y, BigInt<20, 2>(-7654321));
+	}
+},
+{
+	.name = "BigInt -0 == 0",
+	.f = []() {
+		BigInt z(0);
+
+		assert_equal(-z, z);
+	}
+},
+{
+	.name = "BigInt sum",
+	.f = []() {
+		BigInt<20, 2> x("987608548588589");
+		BigInt<20, 2> y("6793564545455289");
+		BigInt<20, 2> z("7781173094043878");
+
+		assert_equal(x+y, z);
+	}
+},
+{
+	.name = "BigInt sum both negative",
+	.f = []() {
+		BigInt<20, 2> x("-987608548588589");
+		BigInt<20, 2> y("-6793564545455289");
+		BigInt<20, 2> z("-7781173094043878");
+
+		assert_equal(x+y, z);
+	}
+},
+{
+	.name = "BigInt sum negative + positive, result positive",
+	.f = []() {
+		BigInt<20, 2> x("-987608548588589");
+		BigInt<20, 2> y("6793564545455289");
+		BigInt<20, 2> z("5805955996866700");
+
+		assert_equal(x+y, z);
+	}
+},
+{
+	.name = "BigInt sum positive + negative, result negative",
+	.f = []() {
+		BigInt<20, 2> x("987608548588589");
+		BigInt<20, 2> y("-6793564545455289");
+		BigInt<20, 2> z("-5805955996866700");
+
+		assert_equal(x+y, z);
+	}
+},
+{
+	.name = "BigInt difference",
+	.f = []() {
+		BigInt<20, 2> x("2342442323434134");
+		BigInt<20, 2> y("2524342523342342");
+		BigInt<20, 2> z("-181900199908208");
+
+		assert_equal(x-y, z);
+	}
+},
+{
+	.name = "BigInt product",
+	.f = []() {
+		BigInt<100, 3> x("134142345244134");
+		BigInt<100, 3> y("-56543047058245");
+		BigInt<100, 3> z("-7584816939642416135042584830");
+
+		assert_equal(x*y, z);
+	}
+},
+{
+	.name = "BigInt operator+=",
+	.f = []() {
+		BigInt<20, 2> x("987608548588589");
+		BigInt<20, 2> y("6793564545455289");
+		BigInt<20, 2> z("7781173094043878");
+
+		x += y;
+
+		assert_equal(x, z);
+	}
+},
+{
+	.name = "BigInt 14 / 3",
+	.f = []() {
+		BigInt x(14);
+		BigInt y(3);
+
+		assert_equal(x / y, 4);
+	}
+},
+{
+	.name = "BigInt 14 % 3",
+	.f = []() {
+		BigInt x(14);
+		BigInt y(3);
+
+		assert_equal(x % y, 2);
+	}
+},
+{
+	.name = "BigInt 14 / -3",
+	.f = []() {
+		BigInt x(14);
+		BigInt y(-3);
+
+		assert_equal(x / y, -5);
+	}
+},
+{
+	.name = "BigInt 14 % -3",
+	.f = []() {
+		BigInt x(14);
+		BigInt y(-3);
+
+		assert_equal(x % y, -1);
+	}
+},
+{
+	.name = "BigInt -14 / 3",
+	.f = []() {
+		BigInt x(-14);
+		BigInt y(3);
+
+		assert_equal(x / y, -5);
+	}
+},
+{
+	.name = "BigInt -14 % 3",
+	.f = []() {
+		BigInt x(-14);
+		BigInt y(3);
+
+		assert_equal(x % y, 1);
+	}
+},
+{
+	.name = "BigInt -14 / -3",
+	.f = []() {
+		BigInt x(-14);
+		BigInt y(-3);
+
+		assert_equal(x / y, 4);
+	}
+},
+{
+	.name = "BigInt -14 % -3",
+	.f = []() {
+		BigInt x(-14);
+		BigInt y(-3);
+
+		assert_equal(x % y, -2);
+	}
+},
+{
+	.name = "BigInt division large numbers, quotient = 0",
+	.f = []() {
+		BigInt<50, 3> x("4534435234134244242");
+		BigInt<50, 3> y("7832478748237487343");
+
+		assert_equal(x / y, 0);
+	}
+},
+{
+	.name = "BigInt division large numbers",
+	.f = []() {
+		BigInt<50, 3> x("12344534435234134244242");
+		BigInt<50, 3> y("7832478748237487343");
+		BigInt<50, 3> z(1576);
+
+		assert_equal(x / y, z);
+	}
+},
+{
+	.name = "BigInt modulo large numbers",
+	.f = []() {
+		BigInt<50, 3> x("12344534435234134244242");
+		BigInt<50, 3> y("7832478748237487343");
+		BigInt<50, 3> z("547928011854191674");
+
+		assert_equal(x % y, z);
+	}
+},
+{
+	.name = "Zmod with BigInt constructor",
+	.f = []() {
+		constexpr BigInt<50, 3> N("78923471");
+		constexpr BigInt<50, 3> x("145452451");
+		Zmod<N> xmodN(x);
+
+		assert_equal(xmodN.toint(), x % N);
+	}
+},
+{
+	.name = "Zmod with BigInt big inverse",
+	.f = []() {
+		constexpr BigInt<50, 3> N("7520824651249795349285");
+		constexpr BigInt<50, 3> x("234589234599896924596");
+		constexpr BigInt<50, 3> expected("5901181270843786267351");
+		Zmod<N> xmodN(x);
+
+		auto inv = xmodN.inverse();
+
+		assert_equal(inv.has_value(), true);
+		assert_equal(inv.value().toint(), expected);
+	}
+},
+/*
+{
+	.name = "This does not compile",
+	.f = []() {
+		constexpr double N = 1.2;
+		Zmod<N> x;
+	}
+}
+*/
 };
 
 int main() {

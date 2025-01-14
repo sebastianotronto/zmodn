@@ -7,16 +7,31 @@
 #include <tuple>
 #include <type_traits>
 
-template<typename INT>
-requires std::is_integral_v<INT>
-std::tuple<INT, INT, INT> extended_gcd(INT a, INT b) {
+template<typename T>
+concept Integer = requires(T a, T b, int i, std::ostream& os) {
+	{T(i)};
+
+	{a + b} -> std::same_as<T>;
+	{a - b} -> std::same_as<T>;
+	{a * b} -> std::same_as<T>;
+	{a / b} -> std::same_as<T>;
+	{a % b} -> std::same_as<T>;
+
+	{a == b} -> std::same_as<bool>;
+	{a != b} -> std::same_as<bool>;
+
+	{os << a} -> std::same_as<std::ostream&>;
+};
+
+template<Integer T>
+std::tuple<T, T, T> extended_gcd(T a, T b) {
 	if (b == 0) return {a, 1, 0};
 	auto [g, x, y] = extended_gcd(b, a%b);
 	return {g, y, x - y*(a/b)};
 }
 
-template<auto N>
-requires(N > 1) && std::is_integral_v<decltype(N)>
+template<Integer auto N>
+requires(N > 1)
 class Zmod {
 public:
 	Zmod(decltype(N) z) : value{(z%N + N) % N} {}
