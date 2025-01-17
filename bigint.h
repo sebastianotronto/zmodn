@@ -124,14 +124,22 @@ public:
 	constexpr BigInt operator%=(const BigInt& z) { return *this = *this % z; }
 
 	friend std::ostream& operator<<(std::ostream& os, const BigInt<N, E>& z) {
-		bool fl = false;
+		if (z == 0) {
+			os << "0";
+			return os;
+		}
+
 		if (!z.sign)
 			os << "-";
-		for (int i = z.D-1; i >= 0; i--)
-			if (fl = fl || z.digits[i] != 0; fl)
-				os << z.digits[i];
-		if (z == 0)
-			os << "0";
+
+		int j;
+		for (j = z.D-1; z.digits[j] == 0; j--) ;
+		os << z.digits[j]; // Top digit is not padded
+
+		for (int i = j-1; i >= 0; i--) {
+			std::string num = std::to_string(z.digits[i]);
+			os << std::string(E - num.length(), '0') << num;
+		}
 		return os;
 	}
 
