@@ -10,7 +10,9 @@ Usage:
 ## BigInt
 
 This repo contains also a class for big integer. Performance are not great,
-but you have a look at it for educational purposes.
+but you can have a look at it for educational purposes.
+
+The script `random_bigint` can be used to generate random big integers.
 
 ## Development
 

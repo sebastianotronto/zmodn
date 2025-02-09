@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <random>
 #include <string_view>
 
 constexpr uint64_t abs64(int64_t);
@@ -122,6 +123,18 @@ public:
 	constexpr BigInt operator*=(const BigInt& z) { return *this = *this * z; }
 	constexpr BigInt operator/=(const BigInt& z) { return *this = *this / z; }
 	constexpr BigInt operator%=(const BigInt& z) { return *this = *this % z; }
+
+	static BigInt random(BigInt r) {
+		std::random_device rd;
+		std::default_random_engine rng(rd());
+		std::uniform_int_distribution<int> distribution(0, M-1);
+
+		BigInt ret;
+		for (uint64_t i = 0; i < D; i++)
+			ret.digits[i] = distribution(rng);
+
+		return ret % r;
+	}
 
 	friend std::ostream& operator<<(std::ostream& os, const BigInt<N, E>& z) {
 		if (z == 0) {

@@ -1,0 +1,34 @@
+#if 0
+
+cc=${CC:-g++}
+bin="$(mktemp)"
+
+if [ -z "$1" ] || [ -z "$2" ]; then
+	echo "Usage: $0 m n"
+	echo "Example: to generate 5 random 25-digits number use"
+	echo "  $0 \\\"10000000000000000000000000\\\" 5"
+	exit 1
+fi
+
+${cc} -x c++ -std=c++20 -o "$bin" -g -O0 "$(realpath $0)" \
+	-DMAX_RANDOM="$1" -DHOW_MANY="$2"
+echo "Running $bin"
+"$bin"
+
+exit 0
+#endif
+
+#include "bigint.h"
+
+#include <iostream>
+
+int main() {
+	// Read compile-time variables
+	int n = HOW_MANY;
+	BigInt<100> r(MAX_RANDOM);
+
+	for (int i = 0; i < n; i++)
+		std::cout << BigInt<100>::random(r) << std::endl;
+
+	return 0;
+}
